@@ -8,7 +8,7 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
-io.origins(["https://socket-client.jsramverk.se:443"]); // Allows client to communicate with server
+io.origins(["https://socket-client.ollebergkvist.me:443"]); // Allows client to communicate with server
 
 // Creates socket.io connection
 io.on("connection", (socket) => {
