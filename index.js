@@ -16,23 +16,23 @@ var dateFormat = require("dateformat");
 // Store messages and users
 var messages = [];
 var users = [];
+var connectedUser = "";
 
 // Creates socket.io connection
 io.on("connection", (socket) => {
-    socket.emit("init-chat", messages); // When user connects, the server sends the user all the current messages
-    socket.emit("update-users", users); // When user connects, the server send the user a list with current users
+    // socket.emit("init-chat", messages); // When user connects, the server sends the user all the current messages
+    socket.emit("active-user-list", users); // When user connects, the server send the user a list with current users
 
     // When a user sends a message, server pushes the info to message list and emits an event
     // Listens on message event
-    socket.on("send-message", (data) => {
+    socket.on("chat-message", (data) => {
         let newMessage = {
             text: data.message,
             user: data.user,
             date: dateFormat(new Date(), "default"),
         };
         messages.push(newMessage);
-        console.log(newMessage);
-        io.emit("read-message", newMessage);
+        io.emit("chat-message", newMessage);
     });
 
     // When user connects. The server updates user list and emits an event
@@ -42,19 +42,37 @@ io.on("connection", (socket) => {
             id: socket.id,
             name: user,
         };
-        console.log(user + " connected"); // Prints connection message event
+
         users.push(newUser);
-        console.log(newUser);
-        io.emit("update-users", users);
+        connectedUser = user;
+        console.log(user + " connected");
+
+        let newMessage = {
+            text: "Connected to chat!",
+            user: connectedUser,
+            date: dateFormat(new Date(), "default"),
+        };
+        io.emit("add-user", newUser);
+        socket.broadcast.emit("chat-message", newMessage);
     });
 
     // When user disconnects from the server, user list updates and emits an event
     // Listens to dicsonnect event
     socket.on("disconnect", () => {
+        console.log(connectedUser + " disconnected");
         users = users.filter(function (user) {
             return user.id != socket.id;
         });
-        io.emit("update-users", users);
+
+        let newMessage = {
+            text: "Disconnected from chat!",
+            user: connectedUser,
+            date: dateFormat(new Date(), "default"),
+        };
+
+        io.emit("active-user-list", users);
+        socket.broadcast.emit("chat-message", newMessage);
+        connectedUser = "";
     });
 });
 
