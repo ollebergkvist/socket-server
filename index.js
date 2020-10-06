@@ -31,15 +31,19 @@ io.on("connection", (socket) => {
             date: dateFormat(new Date(), "default"),
         };
         messages.push(newMessage);
+        console.log(newMessage);
         io.emit("read-message", newMessage);
     });
 
     // When user connects. The server updates user list and emits an event
     // Listens on add-user event
     socket.on("add-user", (user) => {
+        let newUser = {
+            id: socket.id,
+            name: user,
+        };
         console.log(user + " connected"); // Prints connection message event
-        users.push({ id: socket.id, name: user });
-        io.emit("update-users", users);
+        io.emit("update-users", newUser);
     });
 
     // When user disconnects from the server, user list updates and emits an event
