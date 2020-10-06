@@ -43,7 +43,9 @@ io.on("connection", (socket) => {
             name: user,
         };
         console.log(user + " connected"); // Prints connection message event
-        io.emit("update-users", newUser);
+        users.push(newUser);
+        console.log(newUser);
+        io.emit("update-users", users);
     });
 
     // When user disconnects from the server, user list updates and emits an event
