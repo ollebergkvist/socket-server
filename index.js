@@ -10,18 +10,29 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 io.origins([process.env.SOCKET_ORIGIN]); // Allows defined client to communicate with server
 
+// MongoDB
+const mongoDB = require("./db/config/db");
+
 // Dateformat
 var dateFormat = require("dateformat");
 
 // Store messages and users
-var messages = [];
 var users = [];
 var connectedUser = "";
 
 // Creates socket.io connection
 io.on("connection", (socket) => {
-    // socket.emit("init-chat", messages); // When user connects, the server sends the user all the current messages
     socket.emit("active-user-list", users); // When user connects, the server send the user a list with current users
+
+    // When user connects, the server sends the user all the current messages
+    socket.on("get-history", function () {
+        mongoDB
+            .findItemsInCollection()
+            .then((result) => {
+                io.emit("receive-history", result);
+            })
+            .catch((error) => console.log(error));
+    });
 
     // When a user sends a message, server pushes the info to message list and emits an event
     // Listens on message event
@@ -31,8 +42,8 @@ io.on("connection", (socket) => {
             user: data.user,
             date: dateFormat(new Date(), "default"),
         };
-        messages.push(newMessage);
         io.emit("chat-message", newMessage);
+        mongoDB.addItemToCollection(newMessage);
     });
 
     // When user connects. The server updates user list and emits an event
