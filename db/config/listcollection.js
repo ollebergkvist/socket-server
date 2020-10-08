@@ -1,6 +1,8 @@
+require("dotenv").config(); // Requires and configs dotenv
+
 const MongoClient = require("mongodb").MongoClient; // MongoDB
-const url = "mongodb://localhost:27017/chatlog"; // Connection URL
-const dbName = "chatlog";
+const url = process.env.MONGODB_URL; // Connection URL
+const dbName = process.env.MONGODB_DB;
 
 // Lists collections in db
 listCollections().catch((err) => console.log(err));

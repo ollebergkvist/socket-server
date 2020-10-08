@@ -1,6 +1,9 @@
+require("dotenv").config(); // Requires and configs dotenv
+
 const MongoClient = require("mongodb").MongoClient; // MongoDB
-const url = "mongodb://localhost:27017/chatlog"; // Connection URL
-const dbName = "chatlog";
+const url = process.env.MONGODB_URL; // Connection URL
+const dbName = process.env.MONGODB_DB;
+const collectionName = process.env.MONGODB_COLLECTION; // Collection name
 
 // Reset collection
 async function dropCollection() {
@@ -11,7 +14,7 @@ async function dropCollection() {
     });
 
     const db = await client.db(dbName); // Connect do db
-    const collection = await db.collection("chathistory"); // Choose collection
+    const collection = await db.collection(collectionName); // Choose collection
     const result = await collection
         .drop()
         .then(() => {

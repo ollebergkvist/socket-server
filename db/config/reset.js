@@ -1,5 +1,10 @@
+// Dotenv
+require("dotenv").config(); // Requires and configs dotenv
+
 const MongoClient = require("mongodb").MongoClient; // MongoDB
-const url = "mongodb://localhost:27017/chatlog"; // Connection URL
+const url = process.env.MONGODB_URL; // Connection URL
+const dbName = process.env.MONGODB_DB;
+const collectionName = process.env.MONGODB_COLLECTION; // Collection name
 const fs = require("fs");
 const path = require("path");
 const model = JSON.parse(
@@ -14,8 +19,8 @@ async function resetCollection() {
         useUnifiedTopology: true,
     });
 
-    const db = await client.db(); // Connect do db
-    const collection = await db.collection("chathistory"); // Choose collection
+    const db = await client.db(dbName); // Connect do db
+    const collection = await db.collection(collectionName); // Choose collection
 
     await collection.deleteMany();
     // await collection.insertMany(model);
